@@ -18,7 +18,7 @@ Orbis integrates astronomical data with market price streams to analyze the pote
 - 💰 **Market Price Integration** – Live asset data from public APIs (e.g., Gold, BTC)
 - ⚡ **Signal Engine** – Customizable rules to generate bullish/bearish market signals
 - 🧠 **Modular Architecture** – Built in Go with Kafka, Redis, and PostgreSQL
-- 🛰️ **Low-latency Alerts** – Streamed via gRPC, REST API, or WebSocket
+- 🛰️ **Low-latency Alerts** – Streamed via gRPC, REST API
 
 ---
 
@@ -27,7 +27,7 @@ Orbis integrates astronomical data with market price streams to analyze the pote
 - **Language:** Go (Golang)
 - **Stream Processing:** Apache Kafka
 - **Storage:** PostgreSQL (TimescaleDB) + Redis
-- **Deployment:** Docker / Kubernetes (optional)
+- **Deployment:** Docker / Kubernetes
 - **Astro Engine:** NASA/JPL-based ephemeris via Go libraries
 
 ---
