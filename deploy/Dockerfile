@@ -1,10 +1,11 @@
-FROM golang:1.22-bookworm AS builder
-WORKDIR /src
-COPY go.mod go.sum ./
-RUN go mod download
+FROM golang:1.21-alpine3.18 AS builder
+WORKDIR /app
 COPY . .
-RUN CGO_ENABLED=0 go build -o /bin/app ./cmd/$TARGET
+RUN go build -o astro .
 
-FROM gcr.io/distroless/static
-COPY --from=builder /bin/app /app
-ENTRYPOINT ["/app"]
+FROM alpine:3.18
+WORKDIR /app
+COPY --from=builder /app/astro .
+COPY ephems/de440.bsp ./ephems/de440.bsp
+
+ENTRYPOINT ["./astro"]

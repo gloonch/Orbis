@@ -1,0 +1,82 @@
+// internal/astro/stream.go
+package astro
+
+import (
+	"context"
+	"encoding/json"
+	"log"
+	"time"
+
+	"github.com/gloonch/orbis/internal/kafka"
+	"github.com/mshafiee/jpleph"
+)
+
+type PositionMessage struct {
+	Body    string  `json:"body"`
+	X, Y, Z float64 `json:"x,y,z"`
+	Time    float64 `json:"time"`
+}
+
+var planetNames = map[jpleph.Planet]string{
+	jpleph.Sun:     "Sun",
+	jpleph.Moon:    "Moon",
+	jpleph.Mercury: "Mercury",
+	jpleph.Venus:   "Venus",
+	jpleph.Mars:    "Mars",
+	jpleph.Jupiter: "Jupiter",
+	jpleph.Saturn:  "Saturn",
+	jpleph.Uranus:  "Uranus",
+	jpleph.Neptune: "Neptune",
+	jpleph.Pluto:   "Pluto",
+}
+
+func StartPlanetStream(
+	ctx context.Context,
+	ephFile string,
+	body jpleph.Planet,
+	prod *kafka.Producer,
+	topic string,
+	intervalSeconds int,
+) {
+	eph, err := jpleph.NewEphemeris(ephFile, false)
+	if err != nil {
+		log.Fatalf("failed to load ephemeris %s: %v", ephFile, err)
+	}
+	defer eph.Close()
+
+	ticker := time.NewTicker(time.Duration(intervalSeconds) * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case t := <-ticker.C:
+
+			jed := ToJED(t)
+
+			pos, err := GetBodyPosition(ephFile, jed, body, jpleph.CenterEarth)
+			if err != nil {
+				log.Fatalf("error getting position: %v", err)
+			}
+
+			// 3️⃣ ساخت پیام و مارشال شدن به JSON
+			msg := PositionMessage{
+				Body: planetNames[body],
+				X:    pos.X,
+				Y:    pos.Y,
+				Z:    pos.Z,
+				Time: jed,
+			}
+			b, err := json.Marshal(msg)
+			if err != nil {
+				log.Printf("json marshal error: %v", err)
+				continue
+			}
+
+			if err := prod.Publish(topic, planetNames[body], b); err != nil {
+				log.Printf("publish error: %v", err)
+			}
+		}
+	}
+}

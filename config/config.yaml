@@ -1,0 +1,22 @@
+ephemeris:
+  filePath: "ephemeris/linux_p1550p2650.440"
+  # whether to use high-precision mode (slower, more accurate)
+  highPrecision: false
+
+stream:
+  # interval between successive position-publishes (in seconds)
+  intervalSeconds: 10
+
+kafka:
+  # bootstrap brokers
+  brokers:
+    - "localhost:9092"
+  # topic to publish/consume planetary positions
+  topicPositions: "positions"
+  # consumer group ID (must be unique per consumer group)
+  groupID: "orbis-consumer"
+
+#  Logging (optional)
+logging:
+  # debug | info | warn | error
+  level: "info"
