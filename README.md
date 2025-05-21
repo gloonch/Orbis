@@ -1,6 +1,6 @@
 # 🌌 Orbis
-
-**Orbis** is a real-time analytics platform at the intersection of astrology and finance — decoding celestial movements to generate meaningful market signals.
+**Orbis** is a real-time analytics platform at the intersection of astrology and finance decoding celestial movements to generate meaningful market signals.
+It platform at the intersection of astrology and finance decoding celestial movements to generate meaningful market signals.
 
 > *"Connecting the pulse of the cosmos to the heartbeat of the market."*
 
@@ -8,17 +8,30 @@
 
 ## ✨ Overview
 
-Orbis integrates astronomical data with market price streams to analyze the potential correlation between planetary positions and asset behavior. Starting with lunar data and gold price movement, Orbis aims to expand toward a broader range of celestial indicators and financial instruments.
+Orbis integrates three live data streams:
+
+1. **Astronomical Data** (planetary positions & aspects)
+2. **Environmental Data** (extreme heat, humidity, wind, precipitation)
+3. **Market Data** (volumes, prices, volatility)
+
+…to discover and act on statistical **cause-effect pairs** like:
+
+- “Extreme heat → ↓ stock-market volume”
+- “Cold snap → ↑ energy prices”
+- “Full moon square Saturn → bond yields shift”
 
 ---
 
 ## ⚙️ Key Features
 
-- 🔭 **Astrological Data Stream** – Real-time planetary positions (starting with the Moon)
-- 💰 **Market Price Integration** – Live asset data from public APIs (e.g., Gold, BTC)
-- ⚡ **Signal Engine** – Customizable rules to generate bullish/bearish market signals
-- 🧠 **Modular Architecture** – Built in Go with Kafka, Redis, and PostgreSQL
-- 🛰️ **Low-latency Alerts** – Streamed via gRPC, REST API
+-  **Astro Stream** — Real-time ephemeris via NASA/JPL APIs (Sun, Moon, planets & major aspects)
+-  **Weather Stream** — Live feeds (temperature, humidity, wind, AO/HDD indices) from Tomorrow.io/OpenWeatherMap
+-  **Market Stream** — Live prices, volumes, returns & volatility via IEX Cloud/Alpha Vantage
+-  **Cause-Effect Rules** — User-defined “If X then Y” rule engine (e.g. heat index > 35 °C AND full moon square Mars → limit buy)
+-  **Time-Series Storage** — TimescaleDB hypertables for alignment & continuous aggregates
+-  **Visualization** — Grafana dashboards (multi-series charts of astro, weather & market sync’d on a common timeline)
+-  **Alerts & Notifications** — gRPC/REST webhooks, Slack/Email integration when rules fire
+-  **Extensible** — Modular Go services, easily add new streams, new causal pairs or machine-learning models
 
 ---
 
@@ -33,7 +46,8 @@ Orbis integrates astronomical data with market price streams to analyze the pote
 ---
 
 ## 🔮 Inspired By
-Based on mundane astrology frameworks, particularly The Astrology of Nations by John Michael Greer, integrated with modern stream processing architectures.
+- Ecological Economics article: [Extreme Heat & Stock Market Activity (S. Direct 2020)](https://www.sciencedirect.com/science/article/abs/pii/S092180092030015X)
+- Financial Astrology 
 
 
 
