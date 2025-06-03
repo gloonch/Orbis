@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gloonch/orbis/internal/kafka"
+	"github.com/gloonch/orbis/internal/zodiac" // Add this import
 	"github.com/mshafiee/jpleph"
 )
 
@@ -15,6 +16,8 @@ type PositionMessage struct {
 	Body    string  `json:"body"`
 	X, Y, Z float64 `json:"x,y,z"`
 	Time    float64 `json:"time"`
+	House   int     `json:"house"`
+	Degree  float64 `json:"degree"`
 }
 
 var planetNames = map[jpleph.Planet]string{
@@ -60,13 +63,20 @@ func StartPlanetStream(
 				log.Fatalf("error getting position: %v", err)
 			}
 
+			// Calculate ecliptic longitude, house, and degree
+			longitude := zodiac.EclipticLongitude(pos.X, pos.Y, pos.Z)
+			house := zodiac.House(longitude)
+			degree := longitude % 30
+
 			// 3️⃣ ساخت پیام و مارشال شدن به JSON
 			msg := PositionMessage{
-				Body: planetNames[body],
-				X:    pos.X,
-				Y:    pos.Y,
-				Z:    pos.Z,
-				Time: jed,
+				Body:   planetNames[body],
+				X:      pos.X,
+				Y:      pos.Y,
+				Z:      pos.Z,
+				Time:   jed,
+				House:  house,
+				Degree: degree,
 			}
 			b, err := json.Marshal(msg)
 			if err != nil {
