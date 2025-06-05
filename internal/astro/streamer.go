@@ -13,11 +13,14 @@ import (
 )
 
 type PositionMessage struct {
-	Body    string  `json:"body"`
-	X, Y, Z float64 `json:"x,y,z"`
-	Time    float64 `json:"time"`
-	House   int     `json:"house"`
-	Degree  float64 `json:"degree"`
+	Body      string  `json:"body"`
+	X         float64 `json:"x"`
+	Y         float64 `json:"y"`
+	Z         float64 `json:"z"`
+	Time      float64 `json:"time"`
+	House     int     `json:"house"`
+	Degree    float64 `json:"degree"`
+	Longitude float64 `json:"longitude"` // New field
 }
 
 var planetNames = map[jpleph.Planet]string{
@@ -66,17 +69,18 @@ func StartPlanetStream(
 			// Calculate ecliptic longitude, house, and degree
 			longitude := zodiac.EclipticLongitude(pos.X, pos.Y, pos.Z)
 			house := zodiac.House(longitude)
-			degree := longitude % 30
+			degree := longitude / 30
 
 			// 3️⃣ ساخت پیام و مارشال شدن به JSON
 			msg := PositionMessage{
-				Body:   planetNames[body],
-				X:      pos.X,
-				Y:      pos.Y,
-				Z:      pos.Z,
-				Time:   jed,
-				House:  house,
-				Degree: degree,
+				Body:      planetNames[body],
+				X:         pos.X,
+				Y:         pos.Y,
+				Z:         pos.Z,
+				Time:      jed,
+				House:     house,
+				Degree:    degree,
+				Longitude: longitude, // Assign longitude here
 			}
 			b, err := json.Marshal(msg)
 			if err != nil {

@@ -14,12 +14,16 @@ import (
 	"github.com/gloonch/orbis/internal/zodiac"
 )
 
-// PositionMsg matches the JSON payload produced by the producer:
-// { "X": ..., "Y": ..., "Z": ... }
+// PositionMsg matches the JSON payload produced by the producer
 type PositionMsg struct {
-	X float64 `json:"X"`
-	Y float64 `json:"Y"`
-	Z float64 `json:"Z"`
+	Body      string  `json:"body"`
+	X         float64 `json:"x"` // Corresponds to producer's json:"x"
+	Y         float64 `json:"y"` // Corresponds to producer's json:"y"
+	Z         float64 `json:"z"` // Corresponds to producer's json:"z"
+	Time      float64 `json:"time"`
+	House     int     `json:"house"`
+	Degree    float64 `json:"degree"`
+	Longitude float64 `json:"longitude"`
 }
 
 func main() {
@@ -56,24 +60,20 @@ func main() {
 
 	//  Start consuming
 	err = cons.Consume(ctx, func(key string, val []byte) {
-		// key is the planet name, e.g. "Mars"
+		// key is the planet name, e.g. "Mars" - msg.Body will be used instead
 		var msg PositionMsg
 		if err := json.Unmarshal(val, &msg); err != nil {
-			log.Printf("invalid message for %s: %v", key, err)
+			log.Printf("invalid message for key %s: %v", key, err) // Keep key for error logging context
 			return
 		}
 
-		//  Compute ecliptic longitude (degrees) from (X,Y,Z)
-		angle := zodiac.EclipticLongitude(msg.X, msg.Y, msg.Z)
+		// Determine zodiac sign using the Longitude from the message
+		sign := zodiac.Sign(msg.Longitude)
 
-		// Determine zodiac sign and house
-		sign := zodiac.Sign(angle)
-		house := zodiac.House(angle)
-
-		// Output result
+		// Output result using fields directly from the message
 		log.Printf(
-			"%s → %.3f° → %s (House %d)",
-			key, angle, sign, house,
+			"%s → %.3f° %s (House %d)", // Format degree, then sign
+			msg.Body, msg.Degree, sign, msg.House,
 		)
 	})
 	if err != nil && err != context.Canceled {
